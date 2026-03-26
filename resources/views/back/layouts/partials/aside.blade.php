@@ -252,6 +252,11 @@
         </a>
         <ul class="sidebar-submenu" role="menu" aria-label="Sous‑menu Finance">
           <li role="none"><a href="{{ route('admin.scolarites.index') }}" class="{{ request()->routeIs('admin.scolarites.*') ? 'active-page' : '' }}" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Scolarités & tranches</a></li>
+          <li role="none"><a href="{{ route('admin.paiements.create') }}" class="" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Enregistrer paiement</a></li>
+          <li role="none"><a href="{{ route('admin.paiements.index') }}" class="" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Listes paiement</a></li>
+          <li role="none"><a href="{{ route('admin.paiements.debiteurs') }}" class="" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Listes debiteurs </a></li>
+     
+       
         </ul>
       </li>
 

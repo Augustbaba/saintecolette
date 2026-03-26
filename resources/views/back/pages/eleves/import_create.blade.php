@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="dashboard-main-body">
-
     <div class="breadcrumb d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <div>
             <h1 class="fw-semibold mb-4 h6 text-primary-light">Importer des élèves</h1>
             <div>
-                <a href="" class="text-secondary-light hover-text-primary hover-underline">Dashboard</a>
-                <span class="text-secondary-light">/ Élèves / Import</span>
+                <a href="{{ route('admin.dashboard') }}" class="text-secondary-light hover-text-primary hover-underline">Dashboard</a>
+                <a href="{{ route('admin.eleves.index') }}" class="text-secondary-light hover-text-primary hover-underline">Élèves</a>
+                <span class="text-secondary-light">/ Importer</span>
             </div>
         </div>
     </div>
@@ -23,7 +23,6 @@
                     </h5>
                 </div>
                 <div class="card-body">
-
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="ri-checkbox-circle-line me-2"></i>
@@ -40,10 +39,19 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.eleves.import.preview') }}" method="POST" enctype="multipart/form-data">
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('admin.eleves.import.process') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        {{-- Classe - Année --}}
                         <div class="mb-3">
                             <label for="classe_annee_id" class="form-label fw-semibold">
                                 Classe &amp; Année scolaire <span class="text-danger">*</span>
@@ -63,22 +71,20 @@
                             @enderror
                         </div>
 
-                        {{-- Nom de l'onglet --}}
                         <div class="mb-3">
                             <label for="sheet_name" class="form-label fw-semibold">
                                 Nom de l'onglet Excel <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="sheet_name" id="sheet_name"
                                    class="form-control @error('sheet_name') is-invalid @enderror"
-                                   placeholder="Ex : A, 1ère AB, Tle C …"
-                                   value="{{ old('sheet_name') }}" required>
+                                   placeholder="Ex : Feuil1, A, 1ère AB, Tle C …"
+                                   value="{{ old('sheet_name', 'Feuil1') }}" required>
                             @error('sheet_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">Saisir le nom <strong>exact</strong> de l'onglet (respecter majuscules/accents).</div>
                         </div>
 
-                        {{-- Fichier --}}
                         <div class="mb-4">
                             <label for="file" class="form-label fw-semibold">
                                 Fichier Excel <span class="text-danger">*</span>
@@ -105,7 +111,6 @@
             </div>
         </div>
 
-        {{-- Panneau d'aide --}}
         <div class="col-lg-5">
             <div class="card border-0 bg-light">
                 <div class="card-body">
@@ -116,54 +121,68 @@
                     <p class="text-muted small mb-2">
                         Le fichier doit contenir les colonnes suivantes <strong>en ligne 1</strong> :
                     </p>
-                    <table class="table table-sm table-bordered small mb-3">
-                        <thead class="table-primary">
-                            <tr>
-                                <th>Colonne</th>
-                                <th>Obligatoire</th>
-                                <th>Remarque</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><code>Matricule</code></td>
-                                <td><span class="badge bg-secondary">Non</span></td>
-                                <td>Conservé s'il est présent</td>
-                            </tr>
-                            <tr>
-                                <td><code>Nom</code></td>
-                                <td><span class="badge bg-danger">Oui</span></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><code>Prénoms</code></td>
-                                <td><span class="badge bg-danger">Oui</span></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><code>Classe</code></td>
-                                <td><span class="badge bg-secondary">Non</span></td>
-                                <td>Informatif uniquement</td>
-                            </tr>
-                            <tr>
-                                <td><code>N° GSM</code></td>
-                                <td><span class="badge bg-secondary">Non</span></td>
-                                <td>Sert à lier le parent</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered small mb-3">
+                            <thead class="table-primary">
+                                32
+                                    <th>Colonne</th>
+                                    <th>Obligatoire</th>
+                                    <th>Remarque</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>Matricule</code></td>
+                                    <td><span class="badge bg-secondary">Non</span></td>
+                                    <td>Conservé s'il est présent</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Nom</code></td>
+                                    <td><span class="badge bg-danger">Oui</span></td>
+                                    <td>Nom de famille de l'élève</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Prénoms</code></td>
+                                    <td><span class="badge bg-danger">Oui</span></td>
+                                    <td>Prénom(s) de l'élève</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Sexe</code></td>
+                                    <td><span class="badge bg-secondary">Non</span></td>
+                                    <td>M ou F (Masculin/Féminin)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Date Naissance</code></td>
+                                    <td><span class="badge bg-secondary">Non</span></td>
+                                    <td>Format: JJ/MM/AAAA ou AAAA-MM-JJ</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Classe</code></td>
+                                    <td><span class="badge bg-secondary">Non</span></td>
+                                    <td>Informatif uniquement</td>
+                                </tr>
+                                <tr>
+                                    <td><code>N° GSM</code></td>
+                                    <td><span class="badge bg-secondary">Non</span></td>
+                                    <td>Sert à lier le parent s'il existe déjà</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="alert alert-info p-2 small mb-0">
                         <i class="ri-phone-line me-1"></i>
-                        <strong>Téléphone :</strong> les numéros au format
-                        <code>229XXXXXXXX</code> sont automatiquement convertis
-                        en <code>22901XXXXXXXX</code>.<br>
-                        Si le parent existe déjà (même numéro), il est réutilisé.
-                        Sinon, un compte parent est créé automatiquement.
+                        <strong>Téléphone :</strong> les numéros au format <code>229XXXXXXXX</code> sont convertis en <code>22901XXXXXXXX</code>.<br>
+                        <strong class="text-warning">⚠ Important :</strong> Le parent n'est pas créé automatiquement. Seuls les parents existants sont liés à l'élève.
+                    </div>
+                    <div class="alert alert-secondary p-2 small mt-2 mb-0">
+                        <i class="ri-id-card-line me-1"></i>
+                        <strong>Matricule :</strong> 
+                        <code>24-0138</code> → Format automatique avec "01"<br>
+                        Si vide, génération auto : <code>25-010001</code>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 @endsection
