@@ -14,19 +14,19 @@
   <div class="sidebar-header">
     <div class="d-flex align-items-center gap-8 mt-10 px-2 py-8 radius-8 brand-container"
          style="background:rgba(0,51,102,.06); border:1px solid rgba(0,51,102,.12);">
-      <img src="{{ asset('assets/images/LOGOCCPA.jpeg') }}"
-           alt="Logo CCPA"
+      <img src="{{ asset('assets/images/LOGOSC.jpeg') }}"
+           alt="Logo SC"
            class="rounded flex-shrink-0"
            style="width:32px; height:32px; object-fit:contain;"
            loading="lazy">
       <div class="overflow-hidden">
         <span class="d-block text-xs fw-bold text-primary-light text-truncate"
               style="font-size:11px; letter-spacing:.3px;">
-          COMPLEXE CATHOLIQUE
+          COMPLEXE SCOLAIRE
         </span>
         <span class="d-block text-secondary-light text-truncate"
               style="font-size:10px;">
-          PÈRE AUPIAIS — Cotonou
+          SAINTE COLETTE
         </span>
       </div>
 
@@ -158,6 +158,30 @@
         </ul>
       </li>
 
+      {{-- Enseignants (dropdown) --}}
+      <li class="dropdown {{ request()->routeIs('admin.enseignants.*') ? 'open' : '' }}"
+          role="none">
+        <a href="javascript:void(0)"
+           role="menuitem"
+           aria-haspopup="true"
+           aria-expanded="{{ request()->routeIs('admin.enseignants.*') ? 'true' : 'false' }}">
+          <i class="ri-team-line" aria-hidden="true"></i>
+          <span>Enseignants</span>
+          <i class="ri-arrow-down-s-line ms-auto" aria-hidden="true"></i>
+        </a>
+        <ul class="sidebar-submenu" role="menu" aria-label="Sous‑menu Enseignants">
+          <li role="none">
+            <a href="{{ route('admin.enseignants.index') }}"
+               class="{{ request()->routeIs('admin.enseignants.index') ? 'active-page' : '' }}"
+               role="menuitem"
+               @if(request()->routeIs('admin.enseignants.index')) aria-current="page" @endif>
+              <i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i>
+              Liste des enseignants
+            </a>
+          </li>
+        </ul>
+      </li>
+
       {{-- Élèves --}}
       <li class="dropdown {{ request()->routeIs('admin.eleves.*') ? 'open' : '' }}" role="none">
         <a href="javascript:void(0)"
@@ -255,8 +279,8 @@
           <li role="none"><a href="{{ route('admin.paiements.create') }}" class="" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Enregistrer paiement</a></li>
           <li role="none"><a href="{{ route('admin.paiements.index') }}" class="" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Listes paiement</a></li>
           <li role="none"><a href="{{ route('admin.paiements.debiteurs') }}" class="" role="menuitem" @if(request()->routeIs('admin.scolarites.*')) aria-current="page" @endif><i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i> Listes debiteurs </a></li>
-     
-       
+
+
         </ul>
       </li>
 

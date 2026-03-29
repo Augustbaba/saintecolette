@@ -10,13 +10,15 @@ class ClasseMatiere extends Pivot
     use HasFactory;
 
     protected $table = 'classe_matieres';
-    public $incrementing = false;
-    protected $primaryKey = ['classe_annee_id', 'matiere_id'];
+    protected $primaryKey = 'id';
+    public $incrementing  = true;
+    protected $keyType    = 'int';
 
     protected $fillable = [
         'classe_annee_id',
         'matiere_id',
         'coefficient',
+        'enseignant_id'
     ];
 
     protected $casts = [
@@ -31,5 +33,16 @@ class ClasseMatiere extends Pivot
     public function matiere()
     {
         return $this->belongsTo(Matiere::class);
+    }
+
+    public function enseignant()
+    {
+        return $this->belongsTo(Enseignant::class);
+    }
+
+    public function seances()
+    {
+        return $this->hasMany(Seance::class, 'classe_annee_id', 'classe_annee_id')
+                    ->where('matiere_id', $this->matiere_id);
     }
 }

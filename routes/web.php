@@ -7,6 +7,9 @@ use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\CahierNotesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\ClasseMatiereController;
+use App\Http\Controllers\Admin\EnseignantController;
+use App\Http\Controllers\Admin\PersonnelController;
 use App\Http\Controllers\ProfileController;
 
 /*
@@ -48,6 +51,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/', [Admin\ClasseMatiereController::class, 'store'])->name('store');
         Route::put('{matiere}', [Admin\ClasseMatiereController::class, 'update'])->name('update');
         Route::delete('{matiere}', [Admin\ClasseMatiereController::class, 'destroy'])->name('destroy');
+
+        // Séances (emploi du temps)
+        Route::post('matieres/{matiere}/seances',             [ClasseMatiereController::class, 'storeSeance'])
+             ->name('seances.store');
+        Route::put('matieres/{matiere}/seances/{seance}',     [ClasseMatiereController::class, 'updateSeance'])
+             ->name('seances.update');
+        Route::delete('matieres/{matiere}/seances/{seance}',  [ClasseMatiereController::class, 'destroySeance'])
+             ->name('seances.destroy');
     });
 
     // Scolarités
@@ -65,7 +76,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Élèves
     Route::resource('eleves', Admin\EleveController::class)->only(['index']);
-    
+
     // Routes d'import des élèves
     Route::prefix('eleves/import')->name('eleves.import.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\ImportEleveController::class, 'create'])->name('create');
@@ -73,13 +84,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::post('/process', [App\Http\Controllers\Admin\ImportEleveController::class, 'process'])->name('process'); // ← AJOUTEZ CETTE LIGNE
         Route::post('/store', [App\Http\Controllers\Admin\ImportEleveController::class, 'store'])->name('store');
     });
-    
+
     // Paiements
     Route::get('paiements',           [Admin\PaiementController::class, 'index'])->name('paiements.index');
     Route::get('paiements/debiteurs', [Admin\PaiementController::class, 'debiteurs'])->name('paiements.debiteurs');
     Route::get('paiements/create',    [Admin\PaiementController::class, 'create'])->name('paiements.create');
     Route::post('paiements',          [Admin\PaiementController::class, 'store'])->name('paiements.store');
-    
+
     // Notes
     Route::get('/preview', [Admin\NoteController::class, 'preview'])->name('preview.get');
     Route::resource('type-notes', TypeNoteController::class)->except(['show']);
@@ -107,6 +118,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Communiqués
     Route::resource('communiques', \App\Http\Controllers\Admin\CommuniqueController::class);
     Route::patch('communiques/{communique}/toggle', [\App\Http\Controllers\Admin\CommuniqueController::class, 'toggle'])->name('communiques.toggle');
+
+    // ── Enseignants ──────────────────────────────────────────────────────────
+    Route::resource('enseignants', EnseignantController::class);
+    Route::post('enseignants/{enseignant}/reset-password', [EnseignantController::class, 'resetPassword'])
+         ->name('enseignants.reset-password');
+
+    Route::resource('personnel', PersonnelController::class);
+    Route::post('personnel/{personnel}/reset-password', [PersonnelController::class, 'resetPassword'])
+        ->name('personnel.reset-password');
 });
 
 // Routes supplémentaires
