@@ -152,7 +152,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ==================== PROFIL ====================
+// ==================== PROFIL et password ====================
 Route::middleware(['auth', 'actif'])->group(function () {
     Route::get('profile',          [ProfileController::class, 'edit'])           ->name('profile.edit');
     Route::put('profile',          [ProfileController::class, 'update'])          ->name('profile.update');
