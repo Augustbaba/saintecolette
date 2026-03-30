@@ -98,6 +98,10 @@
                   @case('admin')      Administrateur @break
                   @case('enseignant') Enseignant     @break
                   @case('parent')     Parent         @break
+                    @case('censeur')    Censeur        @break
+                    @case('secretaire') Secrétaire     @break
+                    @case('surveillant') Surveillant    @break
+                    @case('comptable')  Comptable      @break
                   @default            Utilisateur
                 @endswitch
               </span>
@@ -115,7 +119,7 @@
               </span>
             </li>
             <li>
-              <a href="#"
+              <a href="{{ route('profile.edit') }}"
                  class="dropdown-item rounded text-secondary-light bg-hover-neutral-200
                         text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
                 <i class="ri-user-3-line"></i> Mon profil

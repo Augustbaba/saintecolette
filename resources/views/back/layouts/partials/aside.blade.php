@@ -92,6 +92,10 @@
                 @case('admin')       Administrateur @break
                 @case('enseignant')  Enseignant     @break
                 @case('parent')      Parent         @break
+                @case('censeur')     Censeur        @break
+                @case('secretaire')  Secrétaire     @break
+                @case('surveillant') Surveillant    @break
+                @case('comptable')   Comptable      @break
                 @default             Utilisateur
               @endswitch
             </span>
@@ -177,6 +181,30 @@
                @if(request()->routeIs('admin.enseignants.index')) aria-current="page" @endif>
               <i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i>
               Liste des enseignants
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      {{-- Personnel (dropdown) --}}
+      <li class="dropdown {{ request()->routeIs('admin.personnel.*') ? 'open' : '' }}"
+          role="none">
+        <a href="javascript:void(0)"
+           role="menuitem"
+           aria-haspopup="true"
+           aria-expanded="{{ request()->routeIs('admin.personnel.*') ? 'true' : 'false' }}">
+          <i class="ri-team-line" aria-hidden="true"></i>
+          <span>Personnel</span>
+          <i class="ri-arrow-down-s-line ms-auto" aria-hidden="true"></i>
+        </a>
+        <ul class="sidebar-submenu" role="menu" aria-label="Sous‑menu personnel">
+          <li role="none">
+            <a href="{{ route('admin.personnel.index') }}"
+               class="{{ request()->routeIs('admin.personnel.index') ? 'active-page' : '' }}"
+               role="menuitem"
+               @if(request()->routeIs('admin.personnel.index')) aria-current="page" @endif>
+              <i class="ri-circle-fill circle-icon w-auto" aria-hidden="true"></i>
+              Liste du personnel
             </a>
           </li>
         </ul>

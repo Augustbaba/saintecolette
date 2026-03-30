@@ -32,21 +32,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Parents
-    Route::get('parents/import', [Admin\ParentController::class, 'showForm'])->name('parents.import.phpoffice');
-    Route::post('parents/import', [Admin\ParentController::class, 'import'])->name('parents.import.phpoffice.post');
+    Route::get('parents/import', [Admin\ParentController::class, 'showForm'])->name('parents.import.phpoffice')->middleware('role:admin,censeur,secretaire');
+    Route::post('parents/import', [Admin\ParentController::class, 'import'])->name('parents.import.phpoffice.post')->middleware('role:admin,censeur,secretaire');
     Route::resource('parents', Admin\ParentController::class)->only(['index', 'edit', 'update', 'destroy']);
-    Route::get('parents/{parent}/reset-password', [Admin\ParentController::class, 'resetPasswordForm'])->name('parents.reset-password.form');
-    Route::post('parents/{parent}/reset-password', [Admin\ParentController::class, 'resetPassword'])->name('parents.reset-password');
+    Route::get('parents/{parent}/reset-password', [Admin\ParentController::class, 'resetPasswordForm'])->name('parents.reset-password.form')->middleware('role:admin,censeur,secretaire');
+    Route::post('parents/{parent}/reset-password', [Admin\ParentController::class, 'resetPassword'])->name('parents.reset-password')->middleware('role:admin,censeur,secretaire');
 
     // Niveaux, classes, années, matières
-    Route::resource('niveaux', Admin\NiveauController::class)->except(['show']);
-    Route::resource('classes', Admin\ClasseController::class)->except(['show']);
-    Route::resource('annees-scolaires', Admin\AnneeScolaireController::class)->except(['show']);
-    Route::resource('classe-annees', Admin\ClasseAnneeController::class)->except(['show']);
-    Route::resource('matieres', Admin\MatiereController::class)->except(['show']);
+    Route::resource('niveaux', Admin\NiveauController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::resource('classes', Admin\ClasseController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::resource('annees-scolaires', Admin\AnneeScolaireController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::resource('classe-annees', Admin\ClasseAnneeController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::resource('matieres', Admin\MatiereController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
 
     // Gestion des coefficients pour une classe-année spécifique
-    Route::prefix('classe-annees/{classeAnnee}/matieres')->name('classe-matieres.')->group(function () {
+    Route::middleware('role:admin,censeur,secretaire,surveillant')->prefix('classe-annees/{classeAnnee}/matieres')->name('classe-matieres.')->group(function () {
         Route::get('/', [Admin\ClasseMatiereController::class, 'index'])->name('index');
         Route::post('/', [Admin\ClasseMatiereController::class, 'store'])->name('store');
         Route::put('{matiere}', [Admin\ClasseMatiereController::class, 'update'])->name('update');
@@ -62,16 +62,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     // Scolarités
-    Route::resource('scolarites', App\Http\Controllers\Admin\ScolariteController::class)->except(['show']);
+    Route::resource('scolarites', App\Http\Controllers\Admin\ScolariteController::class)->except(['show'])->middleware('role:admin,censeur,comptable');
 
     // Tranches imbriquées dans une scolarité
     Route::prefix('scolarites/{scolarite}/tranches')->name('tranches.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\TrancheController::class, 'index'])->name('index');
-        Route::get('create', [App\Http\Controllers\Admin\TrancheController::class, 'create'])->name('create');
-        Route::post('/', [App\Http\Controllers\Admin\TrancheController::class, 'store'])->name('store');
-        Route::get('{tranche}/edit', [App\Http\Controllers\Admin\TrancheController::class, 'edit'])->name('edit');
-        Route::put('{tranche}', [App\Http\Controllers\Admin\TrancheController::class, 'update'])->name('update');
-        Route::delete('{tranche}', [App\Http\Controllers\Admin\TrancheController::class, 'destroy'])->name('destroy');
+        Route::get('create', [App\Http\Controllers\Admin\TrancheController::class, 'create'])->name('create')->middleware('role:admin,censeur,comptable');
+        Route::post('/', [App\Http\Controllers\Admin\TrancheController::class, 'store'])->name('store')->middleware('role:admin,censeur,comptable');
+        Route::get('{tranche}/edit', [App\Http\Controllers\Admin\TrancheController::class, 'edit'])->name('edit')->middleware('role:admin,censeur,comptable');
+        Route::put('{tranche}', [App\Http\Controllers\Admin\TrancheController::class, 'update'])->name('update')->middleware('role:admin,censeur,comptable');
+        Route::delete('{tranche}', [App\Http\Controllers\Admin\TrancheController::class, 'destroy'])->name('destroy')->middleware('role:admin,censeur,comptable');
     });
 
     // Élèves
@@ -93,19 +93,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Notes
     Route::get('/preview', [Admin\NoteController::class, 'preview'])->name('preview.get');
-    Route::resource('type-notes', TypeNoteController::class)->except(['show']);
+    Route::resource('type-notes', TypeNoteController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
 
     // Périodes
-    Route::resource('periodes', App\Http\Controllers\Admin\PeriodeController::class)->except(['show']);
+    Route::resource('periodes', App\Http\Controllers\Admin\PeriodeController::class)->except(['show'])->middleware('role:admin,censeur,secretaire,surveillant');
 
     Route::get('/notes',                   [NoteController::class, 'index'])->name('notes.index');
-    Route::get('/notes/create',            [NoteController::class, 'create'])->name('notes.create');
-    Route::match(['get','post'],'/notes/preview', [NoteController::class, 'preview'])->name('notes.preview');
-    Route::get('/notes/export-template',   [NoteController::class, 'exportTemplate'])->name('notes.export-template');
-    Route::post('/notes/import-preview',   [NoteController::class, 'importPreview'])->name('notes.import-preview');
-    Route::post('/notes/import-image',     [NoteController::class, 'importImage'])->name('notes.import-image');
-    Route::get('/notes/export-pdf',        [NoteController::class, 'exportPdf'])->name('notes.export-pdf');
-    Route::post('/notes',                  [NoteController::class, 'store'])->name('notes.store');
+    Route::get('/notes/create',            [NoteController::class, 'create'])->name('notes.create')->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::match(['get','post'],'/notes/preview', [NoteController::class, 'preview'])->name('notes.preview')->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::get('/notes/export-template',   [NoteController::class, 'exportTemplate'])->name('notes.export-template')->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::post('/notes/import-preview',   [NoteController::class, 'importPreview'])->name('notes.import-preview')->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::post('/notes/import-image',     [NoteController::class, 'importImage'])->name('notes.import-image')->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::get('/notes/export-pdf',        [NoteController::class, 'exportPdf'])->name('notes.export-pdf')->middleware('role:admin,censeur,secretaire,surveillant');
+    Route::post('/notes',                  [NoteController::class, 'store'])->name('notes.store')->middleware('role:admin,censeur,secretaire,surveillant');
 
     // Cahier de notes
     Route::prefix('cahier-notes')->name('cahier-notes.')->group(function () {
@@ -122,16 +122,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // ── Enseignants ──────────────────────────────────────────────────────────
     Route::resource('enseignants', EnseignantController::class);
     Route::post('enseignants/{enseignant}/reset-password', [EnseignantController::class, 'resetPassword'])
-         ->name('enseignants.reset-password');
+         ->name('enseignants.reset-password')->middleware('role:admin,censeur,secretaire,surveillant');
 
-    Route::resource('personnel', PersonnelController::class);
+    Route::resource('personnel', PersonnelController::class)->middleware('role:admin,censeur');
     Route::post('personnel/{personnel}/reset-password', [PersonnelController::class, 'resetPassword'])
-        ->name('personnel.reset-password');
+        ->name('personnel.reset-password')->middleware('role:admin,censeur');
 });
 
 // Routes supplémentaires
 Route::get('notes/export-template-excel', [NoteController::class, 'exportTemplateExcel'])
-     ->name('admin.notes.export-template-excel');
+     ->name('admin.notes.export-template-excel')->middleware('role:admin,censeur,secretaire,surveillant');
 
 // ==================== ROUTES ENSEIGNANT ====================
 Route::prefix('enseignant')->name('enseignant.')->middleware(['auth', 'role:enseignant'])->group(function () {
@@ -153,10 +153,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // ==================== PROFIL ====================
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::middleware(['auth', 'actif'])->group(function () {
+    Route::get('profile',          [ProfileController::class, 'edit'])           ->name('profile.edit');
+    Route::put('profile',          [ProfileController::class, 'update'])          ->name('profile.update');
+    Route::put('profile/password', [ProfileController::class, 'updatePassword']) ->name('profile.password');
 });
 
 // ==================== AUTH ====================
